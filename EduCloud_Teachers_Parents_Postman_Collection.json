@@ -1,0 +1,680 @@
+{
+  "info": {
+    "name": "EduCloud - Teachers & Parents API",
+    "description": "Complete API collection for testing Teacher and Parent endpoints in EduCloud system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "educloud-api"
+  },
+  "item": [
+    {
+      "name": "Teacher APIs",
+      "item": [
+        {
+          "name": "Authentication",
+          "item": [
+            {
+              "name": "Teacher Login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"teacher@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Login as a teacher user"
+              }
+            },
+            {
+              "name": "Teacher Register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"teacher_john\",\n  \"email\": \"teacher@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"teacher\",\n  \"fullName\": \"John Smith\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 School Street\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "Register a new teacher account"
+              }
+            },
+            {
+              "name": "Get Teacher Profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/auth/profile",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ]
+                },
+                "description": "Get authenticated teacher profile"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "Get Assigned Classes",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/teachers/dashboard/classes",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "teachers",
+                    "dashboard",
+                    "classes"
+                  ]
+                },
+                "description": "Get all classes assigned to the teacher"
+              }
+            },
+            {
+              "name": "Get Class Students",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/teachers/dashboard/classes/{{class_id}}/students",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "teachers",
+                    "dashboard",
+                    "classes",
+                    "{{class_id}}",
+                    "students"
+                  ]
+                },
+                "description": "Get all students in a specific class"
+              }
+            },
+            {
+              "name": "Get Student Details",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/teachers/dashboard/students/{{student_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "teachers",
+                    "dashboard",
+                    "students",
+                    "{{student_id}}"
+                  ]
+                },
+                "description": "Get detailed information about a specific student"
+              }
+            },
+            {
+              "name": "Get Teacher Exams",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/teachers/dashboard/exams",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "teachers",
+                    "dashboard",
+                    "exams"
+                  ]
+                },
+                "description": "Get all exams created by the teacher"
+              }
+            },
+            {
+              "name": "Get Class Performance",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/teachers/dashboard/classes/{{class_id}}/performance",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "teachers",
+                    "dashboard",
+                    "classes",
+                    "{{class_id}}",
+                    "performance"
+                  ]
+                },
+                "description": "Get performance data for a specific class"
+              }
+            },
+            {
+              "name": "Get Teacher Schedule",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/teachers/dashboard/schedule",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "teachers",
+                    "dashboard",
+                    "schedule"
+                  ]
+                },
+                "description": "Get teacher's schedule and timetable"
+              }
+            },
+            {
+              "name": "Get Teacher Notifications",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/teachers/dashboard/notifications",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "teachers",
+                    "dashboard",
+                    "notifications"
+                  ]
+                },
+                "description": "Get notifications for the teacher"
+              }
+            },
+            {
+              "name": "Update Teacher Metrics",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/teachers/dashboard/update-metrics",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "teachers",
+                    "dashboard",
+                    "update-metrics"
+                  ]
+                },
+                "description": "Update teacher's performance metrics"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Parent APIs",
+      "item": [
+        {
+          "name": "Authentication",
+          "item": [
+            {
+              "name": "Parent Login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"parent@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Login as a parent user"
+              }
+            },
+            {
+              "name": "Parent Register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"parent_jane\",\n  \"email\": \"parent@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"parent\",\n  \"fullName\": \"Jane Doe\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"456 Home Street\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "Register a new parent account"
+              }
+            },
+            {
+              "name": "Get Parent Profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/auth/profile",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ]
+                },
+                "description": "Get authenticated parent profile"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "Get Children Overview",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/parents/dashboard/children",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "parents",
+                    "dashboard",
+                    "children"
+                  ]
+                },
+                "description": "Get overview of all children linked to the parent"
+              }
+            },
+            {
+              "name": "Get Child Performance",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/parents/dashboard/children/{{student_id}}/performance",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "parents",
+                    "dashboard",
+                    "children",
+                    "{{student_id}}",
+                    "performance"
+                  ]
+                },
+                "description": "Get detailed performance data for a specific child"
+              }
+            },
+            {
+              "name": "Get Child Attendance",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/parents/dashboard/children/{{student_id}}/attendance?month=9&year=2025",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "parents",
+                    "dashboard",
+                    "children",
+                    "{{student_id}}",
+                    "attendance"
+                  ],
+                  "query": [
+                    {
+                      "key": "month",
+                      "value": "9"
+                    },
+                    {
+                      "key": "year",
+                      "value": "2025"
+                    }
+                  ]
+                },
+                "description": "Get attendance report for a specific child"
+              }
+            },
+            {
+              "name": "Contact Teacher",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"studentId\": \"{{student_id}}\",\n  \"teacherId\": \"{{teacher_id}}\",\n  \"subject\": \"Academic Performance\",\n  \"message\": \"I would like to discuss my child's recent performance in mathematics.\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/parents/dashboard/contact-teacher",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "parents",
+                    "dashboard",
+                    "contact-teacher"
+                  ]
+                },
+                "description": "Send a message to a teacher about a child"
+              }
+            },
+            {
+              "name": "Get Parent Notifications",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/parents/dashboard/notifications",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "parents",
+                    "dashboard",
+                    "notifications"
+                  ]
+                },
+                "description": "Get all notifications for the parent"
+              }
+            },
+            {
+              "name": "Mark Notification as Read",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/parents/dashboard/notifications/{{notification_id}}/read",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "parents",
+                    "dashboard",
+                    "notifications",
+                    "{{notification_id}}",
+                    "read"
+                  ]
+                },
+                "description": "Mark a specific notification as read"
+              }
+            },
+            {
+              "name": "Update Communication Preferences",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"emailNotifications\": true,\n  \"smsNotifications\": false,\n  \"pushNotifications\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/parents/dashboard/preferences",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "parents",
+                    "dashboard",
+                    "preferences"
+                  ]
+                },
+                "description": "Update parent's communication preferences"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
+            },
+            "description": "Check the health status of the API server"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://p-educlud.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "teacher_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "parent_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "class_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "student_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teacher_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "notification_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

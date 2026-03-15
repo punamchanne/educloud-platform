@@ -1,0 +1,922 @@
+{
+  "info": {
+    "name": "EduCloud Console API Tests",
+    "_postman_id": "7f4c2a1b-9e2a-4f0b-9b2e-8d7c3e4f5a6c",
+    "description": "Comprehensive tests for EduCloud Console backend APIs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"admin1\",\"email\":\"admin1@example.com\",\"password\":\"admin123\",\"role\":\"admin\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', () => {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response has success and message', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.message).to.equal('User registered successfully');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Student",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"student1\",\"email\":\"student1@example.com\",\"password\":\"student123\",\"role\":\"student\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', () => {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response has success and message', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.message).to.equal('User registered successfully');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"admin1@example.com\",\"password\":\"admin123\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has token and user', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.token).to.be.a('string');",
+                  "  pm.expect(response.user).to.have.property('id');",
+                  "  pm.expect(response.user.role).to.equal('admin');",
+                  "  pm.environment.set('token', response.token);",
+                  "  pm.environment.set('adminId', response.user.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Student",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"student1@example.com\",\"password\":\"student123\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has token and user', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.token).to.be.a('string');",
+                  "  pm.expect(response.user).to.have.property('id');",
+                  "  pm.expect(response.user.role).to.equal('student');",
+                  "  pm.environment.set('studentToken', response.token);",
+                  "  pm.environment.set('studentId', response.user.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Profile (Student)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "profile"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has user with exam history', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.user).to.have.property('examHistory');",
+                  "  pm.expect(response.user).to.have.property('examCount');",
+                  "  pm.expect(response.user).to.have.property('averageScore');",
+                  "  pm.expect(response.user).to.have.property('totalNotifications');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has users array', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.users).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create User (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"staff1\",\"email\":\"staff1@example.com\",\"password\":\"staff123\",\"role\":\"staff\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', () => {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response has user', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.user).to.have.property('_id');",
+                  "  pm.environment.set('staffId', response.user._id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Profile (Student)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "fullName", "value": "Student One", "type": "text" },
+                { "key": "phone", "value": "1234567890", "type": "text" },
+                { "key": "address", "value": "123 Main St", "type": "text" },
+                { "key": "profilePic", "type": "file", "src": "/path/to/test.jpg" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "profile"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has updated user', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.user.profile).to.have.property('fullName', 'Student One');",
+                  "  pm.expect(response.user.profile).to.have.property('profilePic');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete User (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{staffId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{staffId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response confirms deletion', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.message).to.equal('User deleted');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Exams",
+      "item": [
+        {
+          "name": "Create Exam (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Math Exam\",\"description\":\"Midterm exam\",\"scheduledDate\":\"2025-10-01T10:00:00Z\",\"duration\":60,\"subject\":\"Mathematics\",\"numQuestions\":5,\"difficulty\":\"medium\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/exams",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', () => {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response has exam with questions', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.exam).to.have.property('_id');",
+                  "  pm.expect(response.exam.questions).to.be.an('array');",
+                  "  pm.environment.set('examId', response.exam._id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Exam (Student)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"answers\":[\"A\",\"B\",\"C\",\"D\",\"A\"]}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/exams/{{examId}}/submit",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "{{examId}}", "submit"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has score and results', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response).to.have.property('score');",
+                  "  pm.expect(response).to.have.property('totalQuestions');",
+                  "  pm.expect(response).to.have.property('correctAnswers');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Exam (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/{{examId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "{{examId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has exam with results', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.exam).to.have.property('results');",
+                  "  pm.expect(response.exam).to.have.property('participants');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Timetables",
+      "item": [
+        {
+          "name": "Create Timetable (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"class\":\"10th Grade\",\"section\":\"A\",\"slots\":[{\"day\":\"Monday\",\"startTime\":\"09:00\",\"endTime\":\"10:00\",\"subject\":\"Math\",\"location\":\"Room 101\"}],\"useAI\":true}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/timetables",
+              "host": ["{{baseUrl}}"],
+              "path": ["timetables"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', () => {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response has timetable with slots', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.timetable).to.have.property('_id');",
+                  "  pm.expect(response.timetable.slots).to.be.an('array');",
+                  "  pm.environment.set('timetableId', response.timetable._id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Timetable (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"class\":\"10th Grade\",\"section\":\"A\",\"slots\":[{\"day\":\"Monday\",\"startTime\":\"09:00\",\"endTime\":\"10:00\",\"subject\":\"Science\",\"location\":\"Room 102\"}]}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/timetables/{{timetableId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["timetables", "{{timetableId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has updated timetable', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.timetable).to.have.property('slots');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Timetable",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/timetables/{{timetableId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["timetables", "{{timetableId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has timetable', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.timetable).to.have.property('slots');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Generate Student Report (Student)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/user",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "user"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has report', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.report).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generate Exam Report (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/exam/{{examId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "exam", "{{examId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has exam report', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.report).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Create Notification (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"userId\":\"{{studentId}}\",\"type\":\"exam_scheduled\",\"message\":\"Math exam scheduled for Oct 1\",\"priority\":\"high\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', () => {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response has notification', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.notification).to.have.property('_id');",
+                  "  pm.environment.set('notificationId', response.notification._id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Notifications (Student)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications?page=1&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "5" }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has notifications and unread count', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.notifications).to.be.an('array');",
+                  "  pm.expect(response).to.have.property('unreadCount');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark Notification as Read (Student)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/{{notificationId}}/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "{{notificationId}}", "read"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response confirms notification read', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.notification.read).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Uploads",
+      "item": [
+        {
+          "name": "Upload Media (Student)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "media", "type": "file", "src": "/path/to/test.jpg" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/uploads",
+              "host": ["{{baseUrl}}"],
+              "path": ["uploads"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has media URL and publicId', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.url).to.be.a('string');",
+                  "  pm.expect(response.publicId).to.be.a('string');",
+                  "  pm.environment.set('publicId', response.publicId);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Media (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"publicId\":\"{{publicId}}\",\"resourceType\":\"image\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/uploads",
+              "host": ["{{baseUrl}}"],
+              "path": ["uploads"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response confirms deletion', () => {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.success).to.be.true;",
+                  "  pm.expect(response.message).to.equal('Media deleted');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://p-educlud.onrender.com/api",
+      "description": "Base URL of the backend API"
+    }
+  ]
+}

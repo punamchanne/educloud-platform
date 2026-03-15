@@ -1,0 +1,42 @@
+# Robots.txt for EduCloud Educational Platform
+# https://educloud.app/robots.txt
+
+User-agent: *
+Allow: /
+
+# Allow all major search engines to crawl the site
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# Disallow access to sensitive admin areas (additional protection)
+Disallow: /admin/
+Disallow: /api/
+Disallow: /settings/
+
+# Allow access to public content
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /login
+Allow: /register
+
+# Sitemap location
+Sitemap: https://educloud.app/sitemap.xml
+
+# Crawl delay (optional - be respectful to server resources)
+Crawl-delay: 1
