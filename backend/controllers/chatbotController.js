@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import Parent from '../models/Parent.js';
 import Exam from '../models/Exam.js';
 import Timetable from '../models/Timetable.js';
 import Document from '../models/Document.js';
@@ -251,6 +252,9 @@ function detectIntent(message) {
   }
   
   // Fallback intent detection
+  if (message.includes('child') || message.includes('kid') || message.includes('son') || message.includes('daughter') || message.includes('parent')) {
+    return 'parent_queries';
+  }
   if (message.includes('exam') || message.includes('test') || message.includes('quiz')) {
     return 'exam_info';
   }
@@ -375,6 +379,18 @@ async function gatherContextData(intent, userId, userRole, additionalContext = {
       case 'dashboard_info':
         // Get comprehensive dashboard data
         data.dashboard = await gatherDashboardData(userId, userRole);
+        break;
+
+      case 'parent_queries':
+        // Get parent's children data
+        if (userRole === 'parent') {
+          const parent = await Parent.findOne({ user: userId });
+          if (parent) {
+            data.childrenOverview = await parent.getChildrenDetails();
+            data.childrenPerformance = await parent.getChildrenPerformance();
+            data.childrenAttendance = await parent.getAttendanceSummary();
+          }
+        }
         break;
 
       default:
@@ -595,6 +611,18 @@ function getSuggestions(intent, userRole) {
     ]
   };
 
+  if (userRole === 'parent') {
+    if (intent === 'exam_info' || intent === 'performance_info') {
+      return ["Show results for all my children", "Who needs improvement?", "Compare child performance", "View recent results"];
+    }
+    if (intent === 'attendance_info') {
+      return ["Monthly attendance summary", "Are any children absent today?", "Check attendance trends", "View all records"];
+    }
+    if (intent === 'parent_queries') {
+      return ["Which child is doing best?", "Check my son's grades", "View daughter's attendance", "Contact their class teacher"];
+    }
+  }
+
   return [
     ...baseSuggestions,
     ...(roleSuggestions[userRole] || [])
@@ -655,6 +683,13 @@ function generateSuggestions(userRole, category) {
         "View grade distributions",
         "Check teacher performance",
         "Analyze learning trends"
+      ],
+      parent: [
+        "Show performance for all children",
+        "Which subjects need focus?",
+        "Compare child grades",
+        "View recent exam history",
+        "Get academic recommendations for kids"
       ]
     },
     schedule: [

@@ -199,6 +199,27 @@ ${contextData.meetings?.slice(0, 5).map(meeting =>
       }
       break;
 
+    case 'parent_queries':
+      if (userRole === 'parent' && (contextData.childrenOverview || contextData.childrenPerformance)) {
+        const kids = contextData.childrenOverview || [];
+        const perf = contextData.childrenPerformance || [];
+        const att = contextData.childrenAttendance || [];
+        
+        dataContext = `
+👨‍👩‍👧‍👦 PARENT PORTAL - CHILDREN DATA:
+- Total children registered: ${kids.length}
+
+CHILDREN OVERVIEW:
+${kids.map(k => `• ${k.fullName} (${k.class}) - Status: ${k.status}`).join('\n') || 'No child data found'}
+
+ACADEMIC PERFORMANCE:
+${perf.map(p => `• ${p.studentName}: GPA ${p.performance?.gpa || 'N/A'} in ${p.class}`).join('\n') || 'No performance data found'}
+
+ATTENDANCE SUMMARY:
+${att.map(a => `• ${a.studentName}: ${a.attendancePercentage}% attendance`).join('\n') || 'No attendance summary found'}`;
+      }
+      break;
+
     default:
       if (contextData.summary) {
         const examCount = contextData.summary.examCount || 
@@ -383,6 +404,16 @@ export const generateContextualSuggestions = (userMessage, userContext) => {
         "Check notification settings"
       );
       break;
+
+    case 'parent_queries':
+      suggestions.push(
+        "Show my child's progress",
+        "Check daughter's attendance",
+        "Who is my son's teacher?",
+        "Recent parent notifications",
+        "Upcoming parent meetings"
+      );
+      break;
       
     default:
       suggestions.push(
@@ -400,6 +431,8 @@ export const generateContextualSuggestions = (userMessage, userContext) => {
     suggestions.push("View my classes", "Create new document");
   } else if (user.role === 'admin') {
     suggestions.push("Platform statistics", "System health check");
+  } else if (user.role === 'parent') {
+    suggestions.push("Children's performance", "Contact a teacher", "View my children");
   }
   
   return suggestions.slice(0, 6); // Return top 6 suggestions

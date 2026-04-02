@@ -1,5 +1,6 @@
 import Parent from '../models/Parent.js';
 import Student from '../models/Student.js';
+import Teacher from '../models/Teacher.js';
 import Attendance from '../models/Attendance.js';
 import Exam from '../models/Exam.js';
 import Notification from '../models/Notification.js';
@@ -9,7 +10,7 @@ import Notification from '../models/Notification.js';
 // @access  Private (Parent only)
 export const getChildrenOverview = async (req, res) => {
   try {
-    const parent = await Parent.findOne({ user: req.user._id })
+    const parent = await Parent.findOne({ user: req.user.id })
       .populate({
         path: 'children',
         populate: [
@@ -104,7 +105,7 @@ export const getChildPerformance = async (req, res) => {
     const { studentId } = req.params;
 
     // Check if this student is the parent's child
-    const parent = await Parent.findOne({ user: req.user._id });
+    const parent = await Parent.findOne({ user: req.user.id });
     const isChild = parent.children.some(childId =>
       childId.toString() === studentId
     );
@@ -225,7 +226,7 @@ export const getChildAttendance = async (req, res) => {
     const { month, year } = req.query;
 
     // Check if this student is the parent's child
-    const parent = await Parent.findOne({ user: req.user._id });
+    const parent = await Parent.findOne({ user: req.user.id });
     const isChild = parent.children.some(childId =>
       childId.toString() === studentId
     );
@@ -315,7 +316,7 @@ export const contactTeacher = async (req, res) => {
     const { studentId, teacherId, subject, message } = req.body;
 
     // Check if this student is the parent's child
-    const parent = await Parent.findOne({ user: req.user._id });
+    const parent = await Parent.findOne({ user: req.user.id });
     const isChild = parent.children.some(childId =>
       childId.toString() === studentId
     );
@@ -352,7 +353,7 @@ export const contactTeacher = async (req, res) => {
     // Create notification for teacher
     const notification = new Notification({
       recipient: teacher.user,
-      sender: req.user._id,
+      sender: req.user.id,
       type: 'parent_message',
       title: `Message from Parent - ${subject}`,
       message: message,
@@ -382,7 +383,7 @@ export const contactTeacher = async (req, res) => {
 // @access  Private (Parent only)
 export const getParentNotifications = async (req, res) => {
   try {
-    const parent = await Parent.findOne({ user: req.user._id });
+    const parent = await Parent.findOne({ user: req.user.id });
 
     if (!parent) {
       return res.status(404).json({
@@ -393,7 +394,7 @@ export const getParentNotifications = async (req, res) => {
 
     // Get notifications for this parent
     const notifications = await Notification.find({
-      recipient: req.user._id
+      recipient: req.user.id
     })
     .populate('sender', 'profile.fullName')
     .populate('relatedStudent', 'studentId user')
@@ -439,7 +440,7 @@ export const markNotificationRead = async (req, res) => {
 
     const notification = await Notification.findOne({
       _id: notificationId,
-      recipient: req.user._id
+      recipient: req.user.id
     });
 
     if (!notification) {
@@ -474,7 +475,7 @@ export const updateCommunicationPreferences = async (req, res) => {
   try {
     const { emailNotifications, smsNotifications, pushNotifications } = req.body;
 
-    const parent = await Parent.findOne({ user: req.user._id });
+    const parent = await Parent.findOne({ user: req.user.id });
 
     if (!parent) {
       return res.status(404).json({

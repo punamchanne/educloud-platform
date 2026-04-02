@@ -48,10 +48,9 @@ const SurveyGeneration = () => {
   const fetchSurveys = async () => {
     try {
       setLoading(true);
-      // TODO: Implement actual API call when backend endpoint is ready
-      // const response = await api.get('/surveys');
-      // setSurveys(response.data.surveys || []);
-      setSurveys([]); // Empty state until backend is implemented
+      const response = await api.get('/dashboard/analytics?metric=surveys');
+      // Backend doesn't have a direct /surveys yet, but we'll use dashboard data or fallback
+      setSurveys(response.data.surveys || []);
     } catch (error) {
       console.error('Error fetching surveys:', error);
       setSurveys([]);
@@ -66,31 +65,28 @@ const SurveyGeneration = () => {
   const generateSurvey = async () => {
     try {
       setGenerating(true);
-      const token = localStorage.getItem('token');
-      
-      const response = await axios.post(
-        'http://localhost:5000/api/dashboard/surveys/generate',
-        generateForm,
+      const response = await api.post(
+        '/dashboard/surveys/generate',
         {
-          headers: { Authorization: `Bearer ${token}` }
+          purpose: generateForm.title,
+          audience: generateForm.audience,
+          ...generateForm
         }
       );
 
+      const generatedSurvey = response.data.survey;
+
       const newSurvey = {
-        id: Date.now(),
-        title: generateForm.title,
+        id: generatedSurvey.id || Date.now(),
+        title: generatedSurvey.surveyTitle || generateForm.title,
         type: generateForm.type,
-        audience: generateForm.audience,
-        status: 'draft',
+        audience: generatedSurvey.targetAudience || generateForm.audience,
+        status: generatedSurvey.status || 'draft',
         responses: 0,
-        totalTargets: 0,
-        createdAt: new Date().toISOString(),
-        endDate: null,
-        questions: response.data.questions || [
-          { type: 'rating', question: 'Sample AI-generated question 1', required: true },
-          { type: 'multiple', question: 'Sample AI-generated question 2', options: ['Option A', 'Option B', 'Option C'], required: true },
-          { type: 'text', question: 'Sample AI-generated open-ended question', required: false }
-        ],
+        totalTargets: generatedSurvey.expectedResponses || 0,
+        createdAt: generatedSurvey.createdAt || new Date().toISOString(),
+        endDate: generatedSurvey.deadline || null,
+        questions: generatedSurvey.questions || [],
         analytics: {
           completionRate: 0,
           averageRating: 0,

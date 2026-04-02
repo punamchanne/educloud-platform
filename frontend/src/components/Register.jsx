@@ -5,7 +5,7 @@ import { authAPI } from '../services/api';
 import { Mail, Lock, User, Eye, EyeOff, Sparkles, CheckCircle, ArrowRight, Users, BookOpen, Shield, UserPlus } from 'lucide-react';
 
 const Register = () => {
-  const [formData, setFormData] = useState({ username: '', email: '', password: '', role: 'student' });
+  const [formData, setFormData] = useState({ username: '', email: '', password: '', role: 'student', childEmail: '' });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -27,6 +27,12 @@ const Register = () => {
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email';
     if (!formData.password) newErrors.password = 'Password is required';
     else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    
+    if (formData.role === 'parent' && !formData.childEmail) {
+      newErrors.childEmail = 'Child Email is required for parents';
+    } else if (formData.role === 'parent' && !/\S+@\S+\.\S+/.test(formData.childEmail)) {
+      newErrors.childEmail = 'Invalid child email';
+    }
     return newErrors;
   };
 
@@ -169,6 +175,40 @@ const Register = () => {
                   </div>
                   {errors.password && <p className="text-red-500 text-sm mt-2 flex items-center animate-slide-in"><span className="w-1 h-1 bg-red-500 rounded-full mr-2"></span>{errors.password}</p>}
                 </div>
+
+                <div className="group">
+                  <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
+                    <Users size={18} className="mr-2 text-purple-500 group-focus-within:text-purple-600 transition-colors" />
+                    Account Role
+                  </label>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleInputChange}
+                    className="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 bg-white hover:border-purple-300 outline-none"
+                  >
+                    <option value="student" className="text-gray-900">Student</option>
+                    <option value="parent" className="text-gray-900">Parent</option>
+                  </select>
+                </div>
+
+                {formData.role === 'parent' && (
+                  <div className="group transition-all duration-500 transform animate-in fade-in slide-in-from-top-4">
+                    <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
+                      <Mail size={18} className="mr-2 text-purple-500 group-focus-within:text-purple-600 transition-colors" />
+                      Child's Email Address
+                    </label>
+                    <input
+                      type="email"
+                      name="childEmail"
+                      value={formData.childEmail}
+                      onChange={handleInputChange}
+                      className="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 placeholder-gray-400 bg-white hover:border-purple-300"
+                      placeholder="Enter the email your child used to register"
+                    />
+                    {errors.childEmail && <p className="text-red-500 text-sm mt-2 flex items-center animate-slide-in"><span className="w-1 h-1 bg-red-500 rounded-full mr-2"></span>{errors.childEmail}</p>}
+                  </div>
+                )}
 
                 <button
                   type="submit"

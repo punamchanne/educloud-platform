@@ -15,7 +15,11 @@ export const protect = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Attach user data (id, role) to request
+    // Attach user data. Support both id and _id from token
+    req.user = {
+      id: decoded.id || decoded._id,
+      role: decoded.role
+    };
     next();
   } catch (error) {
     res.status(401).json({

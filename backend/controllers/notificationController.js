@@ -2,12 +2,13 @@ import Notification from '../models/Notification.js';
 import User from '../models/User.js';
 import { logger } from '../utils/logger.js';
 import { isValidObjectId, sanitizeInput } from '../utils/validators.js';
+import { sendEmail } from '../utils/email.js';
 
 // Create notification (admin/staff)
 export const createNotification = async (req, res, next) => {
   let userId;
   try {
-    const { userId: reqUserId, type, message, priority, title } = req.body;
+    const { userId: reqUserId, type, message, priority, title, sendAsEmail } = req.body;
     userId = reqUserId;
     if (!isValidObjectId(userId)) {
       const error = new Error('Invalid user ID');
@@ -31,6 +32,21 @@ export const createNotification = async (req, res, next) => {
       priority: sanitizeInput(priority) || 'medium',
     });
     await notification.save();
+
+    // Optionally send email
+    if (sendAsEmail && user.email) {
+      await sendEmail(
+        user.email,
+        notification.title,
+        notification.message,
+        `<div style="font-family: Arial, sans-serif; color: #333;">
+          <h2>${notification.title}</h2>
+          <p>${notification.message}</p>
+          <hr />
+          <p style="font-size: 12px; color: #999;">This is an automated notification from EduCloud.</p>
+        </div>`
+      );
+    }
 
     // Update user's totalNotifications
     user.totalNotifications = await Notification.getUnreadCount(userId);

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { authAPI, contactAPI } from '../services/api';
 import api from '../services/api';
-import { User, Book, Bell, Upload, Eye, EyeOff, Star, Briefcase, Lock, MessageSquare, Mail, Calendar, CheckCircle } from 'lucide-react';
+import { User, Book, Bell, Upload, Eye, EyeOff, Star, Briefcase, Lock, MessageSquare, Mail, Calendar, CheckCircle, Shield, LayoutDashboard, Settings, Users } from 'lucide-react';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -425,12 +425,33 @@ const Profile = () => {
         </div>
 
         {/* Quick Links */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
-            <Link to="/student" className="text-blue-500 hover:underline">Dashboard</Link> |{' '}
-            <Link to="/student/exams" className="text-blue-500 hover:underline">Exams</Link> |{' '}
-            <Link to="/notifications" className="text-blue-500 hover:underline">Notifications</Link> |{' '}
-            <Link to="/features" className="text-blue-500 hover:underline">Features</Link>
+        <div className="mt-8 text-center bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-white/50 shadow-sm">
+          <p className="text-sm text-gray-500 flex items-center justify-center space-x-4">
+            {user.role === 'admin' ? (
+              <Link to="/admin" className="text-blue-600 hover:text-blue-800 font-semibold transition-colors flex items-center">
+                <Shield size={16} className="mr-1" /> Admin Dashboard
+              </Link>
+            ) : user.role === 'teacher' ? (
+              <Link to="/teacher" className="text-blue-600 hover:text-blue-800 font-semibold transition-colors flex items-center">
+                <Briefcase size={16} className="mr-1" /> Teacher Dashboard
+              </Link>
+            ) : user.role === 'parent' ? (
+              <Link to="/parent" className="text-green-600 hover:text-green-800 font-semibold transition-colors flex items-center">
+                <Users size={16} className="mr-1" /> Parent Portal
+              </Link>
+            ) : (
+              <Link to="/student" className="text-blue-600 hover:text-blue-800 font-semibold transition-colors flex items-center">
+                <LayoutDashboard size={16} className="mr-1" /> Student Dashboard
+              </Link>
+            )}
+            <span className="text-gray-300">|</span>
+            <Link to="/notifications" className="text-blue-600 hover:text-blue-800 font-semibold transition-colors flex items-center">
+              <Bell size={16} className="mr-1" /> Notifications
+            </Link>
+            <span className="text-gray-300">|</span>
+            <Link to="/settings" className="text-blue-600 hover:text-blue-800 font-semibold transition-colors flex items-center">
+              <Settings size={16} className="mr-1" /> Settings
+            </Link>
           </p>
         </div>
       </div>

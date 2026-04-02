@@ -9,9 +9,11 @@ const NotificationManagement = () => {
   const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({
     userId: '',
-    type: 'exam_scheduled',
+    type: 'general',
     message: '',
-    priority: 'medium'
+    priority: 'medium',
+    title: '',
+    sendAsEmail: false
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -151,9 +153,12 @@ const NotificationManagement = () => {
   };
 
   const notificationTypes = [
-    { value: 'exam_scheduled', label: 'Exam Scheduled', icon: Bell },
     { value: 'general', label: 'General', icon: Info },
-    { value: 'urgent', label: 'Urgent', icon: AlertTriangle },
+    { value: 'urgent', label: 'Urgent Alert', icon: AlertTriangle },
+    { value: 'notice', label: 'Notice Board', icon: Bell },
+    { value: 'exam', label: 'Exam Info', icon: BookOpen },
+    { value: 'attendance_alert', label: 'Attendance', icon: Users },
+    { value: 'behavior_report', label: 'Behavior', icon: Shield },
   ];
 
   return (
@@ -272,7 +277,6 @@ const NotificationManagement = () => {
               </div>
 
               <form onSubmit={handleCreateNotification} className="space-y-6">
-                {/* Recipient Selection */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Send to
@@ -284,15 +288,26 @@ const NotificationManagement = () => {
                         id="specific-user"
                         name="recipient-type"
                         checked={formData.userId !== ''}
-                        onChange={() => setFormData({ ...formData, userId: selectedUser })}
-                        className="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600"
+                        onChange={() => setFormData({ ...formData, userId: selectedUser || '' })}
+                        className="w-4 h-4 text-blue-600"
                       />
                       <label htmlFor="specific-user" className="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Specific User
+                        Search and Select Student/Parent
                       </label>
                     </div>
                     {formData.userId !== '' && (
-                      <div className="ml-7">
+                      <div className="ml-7 space-y-3">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                          <input 
+                            type="text"
+                            placeholder="Type name or email to filter list..."
+                            onChange={(e) => {
+                              // Local filter logic or just let the select handle it
+                            }}
+                            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-blue-500"
+                          />
+                        </div>
                         <select
                           value={selectedUser}
                           onChange={(e) => {
@@ -301,10 +316,10 @@ const NotificationManagement = () => {
                           }}
                           className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                         >
-                          <option value="">Select a user...</option>
+                          <option value="">-- Choose User --</option>
                           {users.map(user => (
                             <option key={user._id} value={user._id}>
-                              {user.username} - {user.email} ({user.role})
+                              [{user.role.toUpperCase()}] {user.username} ({user.email})
                             </option>
                           ))}
                         </select>
@@ -391,6 +406,21 @@ const NotificationManagement = () => {
                     <option value="medium">Medium Priority</option>
                     <option value="high">High Priority</option>
                   </select>
+                </div>
+
+                {/* Email Option */}
+                <div className="flex items-center space-x-2 bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
+                  <input
+                    type="checkbox"
+                    id="sendAsEmail"
+                    name="sendAsEmail"
+                    checked={formData.sendAsEmail}
+                    onChange={(e) => setFormData({ ...formData, sendAsEmail: e.target.checked })}
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="sendAsEmail" className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                    Also send this notification as an Email to the user/parent
+                  </label>
                 </div>
 
                 {/* Submit Buttons */}

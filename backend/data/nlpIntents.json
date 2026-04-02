@@ -402,12 +402,41 @@
         "demonstration",
         "training",
         "orientation",
-        "onboarding"
+        "onboarding",
+        "how to use this system",
+        "system tutorial",
+        "how to navigate",
+        "how to use parents panel",
+        "parents panel guide",
+        "how to use student panel",
+        "student panel guide"
       ],
       "responses": [
         "I'm here to help! I can assist you with academic data, schedules, performance analysis, and platform navigation.",
         "I can help you with exams, grades, timetables, notifications, documents, attendance, and much more!",
         "Let me guide you through the EduCloud platform features and your academic information."
+      ]
+    },
+    {
+      "tag": "parent_queries",
+      "patterns": [
+        "child progress",
+        "how is my child doing",
+        "my children",
+        "check kid's grades",
+        "child attendance",
+        "parent teacher meeting",
+        "contact teacher",
+        "message teacher",
+        "kid's schedule",
+        "child performance",
+        "son's progress",
+        "daughter's progress"
+      ],
+      "responses": [
+        "I'll retrieve the performance and progress data for your children.",
+        "Let me show you a detailed overview of your child's academic journey.",
+        "Here's the latest information regarding your child's attendance and grades."
       ]
     },
     {

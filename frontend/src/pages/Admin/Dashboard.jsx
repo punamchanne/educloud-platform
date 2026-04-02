@@ -11,22 +11,32 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [usersRes, examsRes, notifRes] = await Promise.all([
+        const [usersRes, examsRes, notifRes, aiInsightsRes] = await Promise.all([
           api.get('/users'),
           api.get('/exams'),
           api.get('/notifications'),
+          api.get('/dashboard/ai-insights'),
         ]);
+
+        const platformMetrics = aiInsightsRes.data.platformMetrics || {};
+
         setStats({
-          users: usersRes.data.users.length,
-          exams: examsRes.data.exams?.length || 0,
-          notifications: notifRes.data.notifications.length,
-          activeUsers: 0, // TODO: Implement active users endpoint
+          users: usersRes.data.users?.length || platformMetrics.totalUsers || 0,
+          exams: examsRes.data.exams?.length || platformMetrics.totalExams || 0,
+          notifications: notifRes.data.notifications?.length || 0,
+          activeUsers: platformMetrics.activeUsers || 0,
         });
 
-        // TODO: Implement recent activity endpoint
-        setRecentActivity([]);
+        const recentExams = aiInsightsRes.data.recentActivity?.exams || [];
+        setRecentActivity(recentExams.map(exam => ({
+          id: exam.id,
+          type: 'exam',
+          action: `New exam scheduled: ${exam.title}`,
+          time: new Date(exam.scheduledDate).toLocaleDateString()
+        })));
+
       } catch (error) {
-        toast.error('Failed to fetch stats');
+        toast.error('Failed to fetch dashboard data');
         console.error('Error:', error.response?.data?.message || error.message);
       }
     };

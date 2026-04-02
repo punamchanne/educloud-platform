@@ -1,4 +1,6 @@
 import User from '../models/User.js';
+import Parent from '../models/Parent.js';
+import Student from '../models/Student.js';
 import jwt from 'jsonwebtoken';
 import { logger } from '../utils/logger.js';
 import { sanitizeInput, isValidObjectId } from '../utils/validators.js';
@@ -40,6 +42,34 @@ export const register = [
       await user.save();
       logger.info(`User registered: ${sanitized.email}`);
 
+      // Handle Parent-Student linking during registration
+      if (sanitized.role === 'parent' && req.body.childEmail) {
+        // Find the user with that email
+        const studentUser = await User.findOne({ email: req.body.childEmail, role: 'student' });
+        
+        if (!studentUser) {
+          logger.warn(`Student with email ${req.body.childEmail} not found for parent registration`);
+        } else {
+          // Find the student profile for this user
+          const studentProfile = await Student.findOne({ user: studentUser._id });
+          
+          if (!studentProfile) {
+            logger.warn(`Student profile not found for user ${req.body.childEmail}`);
+          } else {
+            const parent = new Parent({
+              user: user._id,
+              children: [{
+                studentId: studentProfile._id,
+                relationship: 'other'
+              }],
+              status: 'active'
+            });
+            await parent.save();
+            logger.info(`Parent record created and linked to student user: ${req.body.childEmail}`);
+          }
+        }
+      }
+
       res.status(201).json({ success: true, message: 'User registered successfully' });
     } catch (error) {
       logger.error(`Registration error: ${error.message}`, { email: req.body.email });
@@ -74,7 +104,7 @@ export const login = [
 
       // Generate JWT
       const token = jwt.sign(
-        { id: user._id, role: user.role },
+        { id: user._id, _id: user._id, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: '7d' }
       );

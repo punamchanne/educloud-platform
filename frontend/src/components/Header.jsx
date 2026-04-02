@@ -145,31 +145,7 @@ const Header = () => {
             </Link>
           )}
 
-          {user?.role === 'student' && (
-            <Link
-              to="/student"
-              className="relative px-4 py-2 rounded-xl text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 transition-all duration-300 font-medium group"
-            >
-              <span className="relative z-10 flex items-center space-x-2">
-                <GraduationCap size={18} />
-                <span>Dashboard</span>
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </Link>
-          )}
-
-          {user?.role === 'teacher' && (
-            <Link
-              to="/teacher"
-              className="relative px-4 py-2 rounded-xl text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-green-500 hover:to-teal-500 transition-all duration-300 font-medium group"
-            >
-              <span className="relative z-10 flex items-center space-x-2">
-                <Users size={18} />
-                <span>Dashboard</span>
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </Link>
-          )}
+          {/* Header navigation links for specific roles removed to keep header clean */}
         </nav>
 
         {/* Right Side Actions */}
@@ -411,6 +387,22 @@ const Header = () => {
                             <Users size={16} className="text-slate-600" />
                           </div>
                           <span className="text-sm font-medium text-slate-700">User Management</span>
+                        </Link>
+                      </div>
+                    )}
+                    {user.role === 'parent' && (
+                      <div className="space-y-2">
+                        <Link to="/parent" className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 transition-all duration-300 group" onClick={() => setShowUserDropdown(false)}>
+                          <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg group-hover:scale-110 transition-transform">
+                            <Home size={16} className="text-green-600" />
+                          </div>
+                          <span className="text-sm font-medium text-slate-700">Parent Portal</span>
+                        </Link>
+                        <Link to="/parent/children" className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 transition-all duration-300 group" onClick={() => setShowUserDropdown(false)}>
+                          <div className="p-2 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg group-hover:scale-110 transition-transform">
+                            <Users size={16} className="text-blue-600" />
+                          </div>
+                          <span className="text-sm font-medium text-slate-700">My Children</span>
                         </Link>
                       </div>
                     )}
