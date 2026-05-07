@@ -218,6 +218,11 @@ const SmartTimetableGenerator = () => {
   };
 
   const saveTimetable = async () => {
+    if (!timetableData.class || !timetableData.section) {
+      toast.error('Please enter both Class and Section before saving!');
+      return;
+    }
+
     try {
       const dayMap = {
         'MON': 'Monday',
@@ -264,9 +269,11 @@ const SmartTimetableGenerator = () => {
       };
 
       await api.post('/timetables', timetablePayload);
-      toast.success('Timetable saved successfully!');
+      toast.success(`Timetable for ${timetableData.class} ${timetableData.section} saved successfully!`);
     } catch (error) {
-      toast.error('Failed to save timetable');
+      const errorMsg = error.response?.data?.message || 'Failed to save timetable';
+      const details = error.response?.data?.details?.[0]?.message || '';
+      toast.error(`${errorMsg} ${details}`);
       console.error(error);
     }
   };

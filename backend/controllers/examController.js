@@ -1,5 +1,6 @@
 import Exam from '../models/Exam.js';
 import User from '../models/User.js';
+import Student from '../models/Student.js';
 import { generateExamQuestions } from '../services/geminiService.js';
 import { logger } from '../utils/logger.js';
 import { sanitizeInput, isValidObjectId } from '../utils/validators.js';
@@ -43,7 +44,7 @@ export const submitExam = async (req, res, next) => {
   let examId;
   try {
     examId = req.params.id;
-    const { answers } = req.body; // Array of answers [answer1, answer2, ...]
+    const { answers, timedOut } = req.body; // Array of answers [answer1, answer2, ...]
 
     if (!isValidObjectId(examId)) {
       const error = new Error('Invalid exam ID');
@@ -93,16 +94,36 @@ export const submitExam = async (req, res, next) => {
     }
 
     // Update user exam history
+    let attemptStatus = score >= totalQuestions * 0.5 ? 'passed' : 'failed';
+    if (timedOut) {
+      attemptStatus = 'timed-out';
+    }
+
     user.examHistory.push({
       examId,
       score,
       totalQuestions,
       correctAnswers,
       duration: exam.duration,
-      status: score >= totalQuestions * 0.5 ? 'passed' : 'failed',
+      status: attemptStatus,
+      attemptDate: new Date()
     });
-    await user.updateExamStats();
+    user.updateExamStats();
     await user.save();
+
+    // Update Student model performance for Dashboard/Parent View
+    const student = await Student.findOne({ user: req.user.id });
+    if (student) {
+      const percentage = (score / totalQuestions) * 100;
+      let grade = 'F';
+      if (percentage >= 90) grade = 'A+';
+      else if (percentage >= 80) grade = 'A';
+      else if (percentage >= 70) grade = 'B';
+      else if (percentage >= 60) grade = 'C';
+      else if (percentage >= 50) grade = 'D';
+
+      await student.updatePerformance(exam.subject, percentage, grade);
+    }
 
     // Update exam results
     exam.results.push({
@@ -122,7 +143,8 @@ export const submitExam = async (req, res, next) => {
       score,
       totalQuestions,
       correctAnswers,
-      percentage: Math.round((score / totalQuestions) * 100)
+      percentage: Math.round((score / totalQuestions) * 100),
+      status: attemptStatus
     });
   } catch (error) {
     logger.error(`Submit exam error: ${error.message}`, { examId, userId: req.user.id });

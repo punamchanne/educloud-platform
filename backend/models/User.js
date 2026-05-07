@@ -8,7 +8,7 @@ const examAttemptSchema = new mongoose.Schema({
   correctAnswers: { type: Number, default: 0 },
   attemptDate: { type: Date, default: Date.now },
   duration: { type: Number }, // in minutes
-  status: { type: String, enum: ['passed', 'failed', 'incomplete'], default: 'incomplete' }
+  status: { type: String, enum: ['passed', 'failed', 'incomplete', 'timed-out'], default: 'incomplete' }
 });
 
 const userSchema = new mongoose.Schema({
@@ -26,6 +26,8 @@ const userSchema = new mongoose.Schema({
   examCount: { type: Number, default: 0 }, // Total exams attempted (derived or incremented)
   averageScore: { type: Number, default: 0 }, // Calculated average for profile
   totalNotifications: { type: Number, default: 0 }, // Count for unread notifications
+  resetPasswordToken: { type: String },
+  resetPasswordExpire: { type: Date },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

@@ -13,6 +13,8 @@ import ParentSidebar from './components/ParentSidebar';
 import Profile from './components/Profile';
 import Login from './components/Login';
 import Register from './components/Register';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 import HomePage from './pages/HomePage';
 import AboutUs from './pages/AboutUs';
 import ContactUs from './pages/ContactUs';
@@ -48,6 +50,11 @@ import TeacherDashboard from './pages/Teacher/TeacherDashboard';
 import TeacherClasses from './pages/Teacher/TeacherClasses';
 import ParentDashboard from './pages/Parent/ParentDashboard';
 import ParentChildren from './pages/Parent/ParentChildren';
+import ChildMonitoring from './pages/Parent/ChildMonitoring';
+import ParentReports from './pages/Parent/ParentReports';
+import ParentAttendance from './pages/Parent/ParentAttendance';
+import ContactTeacher from './pages/Parent/ContactTeacher';
+import ParentNotifications from './pages/Parent/ParentNotifications';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 
@@ -190,6 +197,34 @@ const App = () => {
                   url="https://educloud.app/register"
                 />
                 <Register />
+              </>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <>
+                <SEOHead
+                  title="Forgot Password - EduCloud Support"
+                  description="Recover your EduCloud account password. Enter your email to receive a password reset link."
+                  keywords="forgot password, recover account, password reset, EduCloud support"
+                  url="https://educloud.app/forgot-password"
+                />
+                <ForgotPassword />
+              </>
+            }
+          />
+          <Route
+            path="/reset-password/:token"
+            element={
+              <>
+                <SEOHead
+                  title="Reset Password - EduCloud Security"
+                  description="Create a new password for your EduCloud account. Secure your access with a strong password."
+                  keywords="reset password, new password, account security, EduCloud"
+                  url="https://educloud.app/reset-password"
+                />
+                <ResetPassword />
               </>
             }
           />
@@ -760,7 +795,7 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="parent">
                 <ParentLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
-                  <ParentChildren />
+                  <ParentAttendance />
                 </ParentLayout>
               </ProtectedRoute>
             }
@@ -770,7 +805,7 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="parent">
                 <ParentLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
-                  <ParentChildren />
+                  <ChildMonitoring />
                 </ParentLayout>
               </ProtectedRoute>
             }
@@ -780,7 +815,7 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="parent">
                 <ParentLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
-                  <ReportManagement />
+                  <ParentReports />
                 </ParentLayout>
               </ProtectedRoute>
             }
@@ -790,7 +825,7 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="parent">
                 <ParentLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
-                  <ParentChildren />
+                  <ContactTeacher />
                 </ParentLayout>
               </ProtectedRoute>
             }
@@ -800,7 +835,7 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="parent">
                 <ParentLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
-                  <NotificationManagement />
+                  <ParentNotifications />
                 </ParentLayout>
               </ProtectedRoute>
             }

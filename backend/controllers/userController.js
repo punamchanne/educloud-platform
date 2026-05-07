@@ -17,6 +17,22 @@ export const getAllUsers = async (req, res, next) => {
   }
 };
 
+// Get all staff/teacher users (accessible by admin, teacher, and parent)
+export const getStaffUsers = async (req, res, next) => {
+  try {
+    const staff = await User.find({ role: 'teacher' }).select('profile email role');
+    res.json({ 
+      success: true, 
+      data: {
+        users: staff
+      }
+    });
+  } catch (error) {
+    logger.error(`Fetch staff users error: ${error.message}`);
+    next(error);
+  }
+};
+
 // Create user (admin only)
 export const createUser = [
   validate('register'),
@@ -45,7 +61,7 @@ export const createUser = [
       // If student, create student record
       if (role === 'student') {
         const student = new Student({
-          userId: user._id,
+          user: user._id,
           studentId: `STU-${Date.now()}`,
         });
         await student.save();
@@ -131,7 +147,7 @@ export const deleteUser = async (req, res, next) => {
 
     await user.deleteOne();
     if (user.role === 'student') {
-      await Student.deleteOne({ userId });
+      await Student.deleteOne({ user: userId });
     }
 
     logger.info(`User deleted: ${user.email}`);

@@ -31,8 +31,8 @@ const schemas = {
     slots: Joi.array().items(
       Joi.object({
         day: Joi.string().valid('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday').required(),
-        startTime: Joi.string().pattern(/^[0-2][0-9]:[0-5][0-9]$/).required(),
-        endTime: Joi.string().pattern(/^[0-2][0-9]:[0-5][0-9]$/).required(),
+        startTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).required(),
+        endTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).required(),
         subject: Joi.string().allow(''),
         location: Joi.string().allow(''),
       })
@@ -67,6 +67,12 @@ const schemas = {
     message: Joi.string().min(1).max(1000).required(),
     context: Joi.object().optional(),
   }),
+  forgotPassword: Joi.object({
+    email: Joi.string().email().required(),
+  }),
+  resetPassword: Joi.object({
+    password: Joi.string().min(6).required(),
+  }),
 };
 
 // Middleware to validate request body
@@ -94,5 +100,7 @@ export const validateTimetable = validate('timetable');
 export const validateDocument = validate('document');
 export const validateMeeting = validate('meeting');
 export const validateChatMessage = validate('chatMessage');
+export const validateForgotPassword = validate('forgotPassword');
+export const validateResetPassword = validate('resetPassword');
 
 export default validate;

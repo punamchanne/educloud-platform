@@ -152,6 +152,11 @@ const Login = () => {
                     </button>
                   </div>
                   {errors.password && <p className="text-red-500 text-sm mt-2 flex items-center animate-slide-in"><span className="w-1 h-1 bg-red-500 rounded-full mr-2"></span>{errors.password}</p>}
+                  <div className="flex justify-end mt-2">
+                    <Link to="/forgot-password" size="sm" className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                      Forgot Password?
+                    </Link>
+                  </div>
                 </div>
 
                 <button

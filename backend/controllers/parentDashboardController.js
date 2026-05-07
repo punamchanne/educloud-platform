@@ -4,15 +4,109 @@ import Teacher from '../models/Teacher.js';
 import Attendance from '../models/Attendance.js';
 import Exam from '../models/Exam.js';
 import Notification from '../models/Notification.js';
+import User from '../models/User.js';
+import { logger } from '../utils/logger.js';
 
-// @desc    Get parent's children overview
+// @desc    Add a child to parent's list
+// @route   POST /api/parents/dashboard/children/add
+// @access  Private (Parent only)
+export const addChild = async (req, res) => {
+  try {
+    const { childEmail, relationship = 'guardian' } = req.body;
+
+    if (!childEmail) {
+      return res.status(400).json({
+        success: false,
+        message: 'Child email is required'
+      });
+    }
+
+    // Find the user with that email
+    const studentUser = await User.findOne({ email: childEmail.toLowerCase(), role: 'student' });
+    if (!studentUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'No student found with this email address'
+      });
+    }
+
+    // Find the student profile for this user
+    let studentProfile = await Student.findOne({ user: studentUser._id });
+    if (!studentProfile) {
+      // Create missing Student record for legacy users
+      studentProfile = new Student({
+        user: studentUser._id,
+        studentId: `STU${Date.now().toString().slice(-6)}`,
+        academicInfo: {
+          className: 'Not Assigned',
+          rollNumber: 'TBD'
+        },
+        status: 'active'
+      });
+      await studentProfile.save();
+      logger.info(`Synthesized missing Student record for user: ${childEmail}`);
+    }
+
+    // Find or synthesize the parent profile
+    let parent = await Parent.findOne({ user: req.user.id });
+    if (!parent) {
+      // Create missing Parent record for legacy users
+      parent = new Parent({
+        user: req.user.id,
+        children: [],
+        status: 'active'
+      });
+      await parent.save();
+      logger.info(`Synthesized missing Parent record for user ID: ${req.user.id}`);
+    }
+
+    // Check if child is already linked
+    const isAlreadyLinked = parent.children.some(child => 
+      child.studentId.toString() === studentProfile._id.toString()
+    );
+
+    if (isAlreadyLinked) {
+      return res.status(400).json({
+        success: false,
+        message: 'This child is already linked to your account'
+      });
+    }
+
+    // Add child to parent's list
+    parent.children.push({
+      studentId: studentProfile._id,
+      relationship: ['father', 'mother', 'guardian', 'other'].includes(relationship.toLowerCase()) 
+        ? relationship.toLowerCase() 
+        : 'guardian'
+    });
+
+    await parent.save();
+
+    res.json({
+      success: true,
+      message: `${studentUser.profile?.fullName || studentUser.username} has been linked to your account successfully`,
+      data: {
+        studentId: studentProfile._id,
+        fullName: studentUser.profile?.fullName || studentUser.username
+      }
+    });
+
+  } catch (error) {
+    console.error('Add child error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error linking child',
+      error: error.message
+    });
+  }
+};
 // @route   GET /api/parents/dashboard/children
 // @access  Private (Parent only)
 export const getChildrenOverview = async (req, res) => {
   try {
     const parent = await Parent.findOne({ user: req.user.id })
       .populate({
-        path: 'children',
+        path: 'children.studentId',
         populate: [
           {
             path: 'user',
@@ -26,15 +120,22 @@ export const getChildrenOverview = async (req, res) => {
       });
 
     if (!parent) {
-      return res.status(404).json({
-        success: false,
+      return res.json({
+        success: true,
+        data: {
+          totalChildren: 0,
+          children: []
+        },
         message: 'Parent profile not found'
       });
     }
 
     const childrenData = [];
 
-    for (const child of parent.children) {
+    for (const childItem of parent.children) {
+      const child = childItem.studentId;
+      if (!child) continue;
+
       // Get attendance summary
       const attendanceSummary = await child.getAttendanceSummary();
 
@@ -64,8 +165,9 @@ export const getChildrenOverview = async (req, res) => {
 
       childrenData.push({
         id: child._id,
+        userId: child.user?._id,
         studentId: child.studentId,
-        fullName: child.user.profile.fullName,
+        fullName: child.user?.profile?.fullName || 'Unknown Student',
         class: child.academicInfo.class?.className,
         grade: child.academicInfo.class?.grade,
         section: child.academicInfo.class?.section,
@@ -106,8 +208,8 @@ export const getChildPerformance = async (req, res) => {
 
     // Check if this student is the parent's child
     const parent = await Parent.findOne({ user: req.user.id });
-    const isChild = parent.children.some(childId =>
-      childId.toString() === studentId
+    const isChild = parent.children.some(childItem =>
+      childItem.studentId.toString() === studentId
     );
 
     if (!isChild) {
@@ -172,8 +274,8 @@ export const getChildPerformance = async (req, res) => {
     // Calculate performance trends
     const performanceTrend = {
       currentGPA: student.performance.overallGPA,
-      subjectWise: student.performance.subjectWise || {},
-      improvementAreas: student.performance.improvementAreas || []
+      subjectWise: student.performance.subjects || [],
+      improvementAreas: []
     };
 
     res.json({
@@ -189,9 +291,9 @@ export const getChildPerformance = async (req, res) => {
         },
         performance: {
           overallGPA: student.performance.overallGPA,
-          subjectWise: student.performance.subjectWise,
-          improvementAreas: student.performance.improvementAreas,
-          trend: performanceTrend
+          subjectWise: student.performance.subjects || [],
+          improvementAreas: student.performance.improvementAreas || [],
+          trend: []
         },
         exams: {
           totalExams: examResults.length,
@@ -227,8 +329,8 @@ export const getChildAttendance = async (req, res) => {
 
     // Check if this student is the parent's child
     const parent = await Parent.findOne({ user: req.user.id });
-    const isChild = parent.children.some(childId =>
-      childId.toString() === studentId
+    const isChild = parent.children.some(childItem =>
+      childItem.studentId.toString() === studentId
     );
 
     if (!isChild) {
@@ -317,8 +419,8 @@ export const contactTeacher = async (req, res) => {
 
     // Check if this student is the parent's child
     const parent = await Parent.findOne({ user: req.user.id });
-    const isChild = parent.children.some(childId =>
-      childId.toString() === studentId
+    const isChild = parent.children.some(childItem =>
+      childItem.studentId.toString() === studentId
     );
 
     if (!isChild) {
@@ -386,8 +488,9 @@ export const getParentNotifications = async (req, res) => {
     const parent = await Parent.findOne({ user: req.user.id });
 
     if (!parent) {
-      return res.status(404).json({
-        success: false,
+      return res.json({
+        success: true,
+        data: [],
         message: 'Parent profile not found'
       });
     }

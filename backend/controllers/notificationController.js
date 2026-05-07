@@ -33,9 +33,9 @@ export const createNotification = async (req, res, next) => {
     });
     await notification.save();
 
-    // Optionally send email
+    // Optionally send email in background (non-blocking)
     if (sendAsEmail && user.email) {
-      await sendEmail(
+      sendEmail(
         user.email,
         notification.title,
         notification.message,

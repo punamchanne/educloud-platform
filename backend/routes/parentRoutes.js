@@ -6,7 +6,8 @@ import {
   contactTeacher,
   getParentNotifications,
   markNotificationRead,
-  updateCommunicationPreferences
+  updateCommunicationPreferences,
+  addChild
 } from '../controllers/parentDashboardController.js';
 import { protect, parentOnly } from '../middlewares/auth.js';
 
@@ -22,6 +23,7 @@ router.get('/dashboard/children/:studentId/performance', getChildPerformance);
 router.get('/dashboard/children/:studentId/attendance', getChildAttendance);
 router.post('/dashboard/contact-teacher', contactTeacher);
 router.get('/dashboard/notifications', getParentNotifications);
+router.post('/dashboard/children/add', addChild);
 router.put('/dashboard/notifications/:notificationId/read', markNotificationRead);
 router.put('/dashboard/preferences', updateCommunicationPreferences);
 

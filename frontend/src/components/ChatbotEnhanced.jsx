@@ -70,28 +70,50 @@ const ChatbotEnhanced = () => {
         setHasInitialized(true);
         
         if (messages.length === 0) {
+          const isParent = data.data.user.role === 'parent';
+          
+          const parentSuggestions = [
+            'Monitor my child\'s progress',
+            'Check average attendance',
+            'View recent exam results',
+            'Contact class teacher',
+            'Latest school notifications'
+          ];
+
+          const studentSuggestions = [
+            'Show my dashboard',
+            'Check my grades',
+            'View upcoming exams', 
+            'Show my timetable',
+            'Recent notifications'
+          ];
+
+          if (isParent) {
+            setSuggestions(parentSuggestions);
+          } else {
+            setSuggestions(studentSuggestions);
+          }
+
           const welcomeMessage = {
             id: Date.now(),
             type: 'bot',
             content: `Hello ${data.data.user.username || data.data.user.name || 'there'}! 👋 I'm your EduCloud AI Assistant. How can I assist you today?
 
 I can help you with:
-• Check your exam schedules and results
+${isParent ? `• Monitor your child's academic progress
+• Track daily attendance reports
+• View detailed exam results
+• Contact teachers regarding performance
+• Review updates and reminders` : `• Check your exam schedules and results
 • View your class timetable  
 • Review notifications and updates
 • Track your academic progress
-• Get help with assignments
+• Get help with assignments`}
 • Navigate platform features
 
 What would you like to know about?`,
             intent: 'welcome',
-            suggestions: [
-              'Show my dashboard',
-              'Check my grades',
-              'View upcoming exams', 
-              'Show my timetable',
-              'Recent notifications'
-            ],
+            suggestions: isParent ? parentSuggestions : studentSuggestions,
             isWelcome: true,
             timestamp: new Date()
           };

@@ -8,7 +8,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // AI-Powered Dashboard Insights Generator
 export const generateDashboardInsights = async (userData) => {
-  const models = ['gemini-1.5-flash', 'gemini-1.5-pro'];
+  const models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
 
   for (const modelName of models) {
     try {
@@ -54,7 +54,7 @@ export const generateDashboardInsights = async (userData) => {
 
 // AI Document Console - Generate educational documents
 export const generateEducationalDocument = async (docType, parameters) => {
-  const models = ['gemini-1.5-flash', 'gemini-1.5-pro'];
+  const models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
 
   for (const modelName of models) {
     try {
@@ -238,7 +238,7 @@ export const generateReport = async (reportData) => {
 
 // AI-Powered Timetable & Scheduling
 export const generateOptimalTimetable = async (scheduleData) => {
-  const models = ['gemini-1.5-flash', 'gemini-1.5-pro'];
+  const models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
 
   for (const modelName of models) {
     try {
@@ -317,7 +317,7 @@ export const generateOptimalTimetable = async (scheduleData) => {
 
 // Meeting & Event Management AI Assistant
 export const generateMeetingInsights = async (meetingData) => {
-  const models = ['gemini-1.5-flash', 'gemini-1.5-pro'];
+  const models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
 
   for (const modelName of models) {
     try {
@@ -367,7 +367,7 @@ export const generateMeetingInsights = async (meetingData) => {
 
 // Feedback & Survey Generator with AI
 export const generateSurveyQuestions = async (surveyConfig) => {
-  const models = ['gemini-1.5-flash', 'gemini-1.5-pro'];
+  const models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
 
   for (const modelName of models) {
     try {
@@ -432,7 +432,7 @@ export const generateSurveyQuestions = async (surveyConfig) => {
 
 // Enhanced Exam Question Generation
 export const generateExamQuestions = async (subject, numQuestions = 10, difficulty = 'medium', examType = 'assessment') => {
-  const models = ['gemini-1.5-flash', 'gemini-1.5-pro'];
+  const models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
 
   for (const modelName of models) {
     try {

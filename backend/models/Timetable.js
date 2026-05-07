@@ -28,8 +28,10 @@ const schoolHoursSchema = new mongoose.Schema({
 });
 
 const timetableSchema = new mongoose.Schema({
-  class: { type: String, required: true }, // e.g., '10th Grade'
+  class: { type: String, required: true },
   section: { type: String },
+  department: { type: String, default: 'General' },
+  academicYear: { type: String, default: new Date().getFullYear().toString() },
   slots: [slotSchema],
   subjects: [subjectSchema],
   breakTimes: [breakTimeSchema],

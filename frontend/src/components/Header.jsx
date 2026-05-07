@@ -8,6 +8,7 @@ import {
   Home, GraduationCap, Award, FileText, Clock, Activity,
   Sparkles, ArrowRight, Search, Heart, Star
 } from 'lucide-react';
+import NoticeMarquee from './NoticeMarquee';
 
 
 const Header = () => {
@@ -76,6 +77,7 @@ const Header = () => {
         ? 'bg-white/95 backdrop-blur-xl border-b border-slate-200/50 shadow-xl'
         : 'bg-gradient-to-r from-slate-50/80 via-blue-50/60 to-purple-50/80 backdrop-blur-md'
     }`}>
+      <NoticeMarquee />
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-3 group">

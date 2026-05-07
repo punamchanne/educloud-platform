@@ -50,7 +50,7 @@ const ExamResults = () => {
     );
   }
 
-  const { score, totalQuestions, correctAnswers, questionResults = [], timeTaken, averageTimePerQuestion } = results;
+  const { score, totalQuestions, correctAnswers, questionResults = [], timeTaken, averageTimePerQuestion, status } = results;
   const percentage = Math.round((score / totalQuestions) * 100);
   const incorrectAnswers = totalQuestions - correctAnswers;
 
@@ -129,6 +129,19 @@ const ExamResults = () => {
           </h1>
           <p className="text-lg text-slate-600">Your performance summary</p>
         </div>
+
+        {/* Timed Out Warning */}
+        {status === 'timed-out' && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6 mb-8 flex items-center shadow-md animate-pulse">
+            <div className="bg-red-100 p-3 rounded-full mr-4">
+              <Clock className="w-8 h-8 text-red-600" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-red-800">Exam Timed Out</h3>
+              <p className="text-red-700">This exam was automatically submitted because the time limit was reached.</p>
+            </div>
+          </div>
+        )}
 
         {/* Main Results Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">

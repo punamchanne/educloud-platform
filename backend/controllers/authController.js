@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import { logger } from '../utils/logger.js';
 import { sanitizeInput, isValidObjectId } from '../utils/validators.js';
 import validate from '../middlewares/validation.js';
+import { sendEmail } from '../utils/email.js';
+import crypto from 'crypto';
 import { config } from 'dotenv';
 
 config();
@@ -42,32 +44,42 @@ export const register = [
       await user.save();
       logger.info(`User registered: ${sanitized.email}`);
 
-      // Handle Parent-Student linking during registration
-      if (sanitized.role === 'parent' && req.body.childEmail) {
-        // Find the user with that email
-        const studentUser = await User.findOne({ email: req.body.childEmail, role: 'student' });
+      // Handle Role-Specific Account Creation
+      if (sanitized.role === 'student') {
+        // Create initial Student academic record
+        const student = new Student({
+          user: user._id,
+          studentId: `STU${Date.now().toString().slice(-6)}`, // Auto-generate unique ID
+          academicInfo: {
+            className: 'Not Assigned',
+            rollNumber: 'TBD'
+          },
+          status: 'active'
+        });
+        await student.save();
+        logger.info(`Student record created for user: ${sanitized.email}`);
+      } 
+      else if (sanitized.role === 'parent') {
+        let studentProfile = null;
         
-        if (!studentUser) {
-          logger.warn(`Student with email ${req.body.childEmail} not found for parent registration`);
-        } else {
-          // Find the student profile for this user
-          const studentProfile = await Student.findOne({ user: studentUser._id });
-          
-          if (!studentProfile) {
-            logger.warn(`Student profile not found for user ${req.body.childEmail}`);
-          } else {
-            const parent = new Parent({
-              user: user._id,
-              children: [{
-                studentId: studentProfile._id,
-                relationship: 'other'
-              }],
-              status: 'active'
-            });
-            await parent.save();
-            logger.info(`Parent record created and linked to student user: ${req.body.childEmail}`);
+        // If child email provided, try to link
+        if (req.body.childEmail) {
+          const studentUser = await User.findOne({ email: req.body.childEmail, role: 'student' });
+          if (studentUser) {
+            studentProfile = await Student.findOne({ user: studentUser._id });
           }
         }
+
+        const parent = new Parent({
+          user: user._id,
+          children: studentProfile ? [{
+            studentId: studentProfile._id,
+            relationship: 'other'
+          }] : [],
+          status: 'active'
+        });
+        await parent.save();
+        logger.info(`Parent record created for user: ${sanitized.email}`);
       }
 
       res.status(201).json({ success: true, message: 'User registered successfully' });
@@ -163,3 +175,106 @@ export const getProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+// Forgot Password - Send reset email
+export const forgotPassword = [
+  validate('forgotPassword'),
+  async (req, res, next) => {
+    try {
+      const user = await User.findOne({ email: req.body.email });
+
+      if (!user) {
+        const error = new Error('No user found with that email');
+        error.statusCode = 404;
+        throw error;
+      }
+
+      // Generate random reset token
+      const resetToken = crypto.randomBytes(20).toString('hex');
+
+      // Hash token and set to resetPasswordToken field
+      user.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+      // Set expire (10 minutes)
+      user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+      await user.save({ validateBeforeSave: false });
+
+      // Create reset URL
+      const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+      const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please click the link below to reset your password: \n\n ${resetUrl}`;
+
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #4a90e2; text-align: center;">Password Reset Request</h2>
+          <p>You requested a password reset for your EduCloud account. Click the button below to reset your password:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetUrl}" style="background-color: #4a90e2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+          </div>
+          <p>This link will expire in 10 minutes.</p>
+          <p>If you didn't request this, please ignore this email.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #888; text-align: center;">EduCloud Admin Team</p>
+        </div>
+      `;
+
+      const emailRes = await sendEmail(user.email, 'Password Reset Token', message, html);
+
+      if (emailRes.success) {
+        res.status(200).json({ success: true, message: 'Email sent' });
+      } else {
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save({ validateBeforeSave: false });
+        
+        const error = new Error('Email could not be sent');
+        error.statusCode = 500;
+        throw error;
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+];
+
+// Reset Password - Verify token and set new password
+export const resetPassword = [
+  validate('resetPassword'),
+  async (req, res, next) => {
+    try {
+      // Get hashed token
+      const resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(req.params.resetToken)
+        .digest('hex');
+
+      const user = await User.findOne({
+        resetPasswordToken,
+        resetPasswordExpire: { $gt: Date.now() },
+      });
+
+      if (!user) {
+        const error = new Error('Invalid or expired reset token');
+        error.statusCode = 400;
+        throw error;
+      }
+
+      // Set new password
+      user.password = req.body.password;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Password reset successful',
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+];

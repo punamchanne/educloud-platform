@@ -40,9 +40,7 @@ const TakeExam = () => {
         const token = localStorage.getItem('token');
 
         // First check exam status for this user
-        const statusRes = await axios.get(`http://localhost:5000/api/exams/${id}/status`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const statusRes = await api.get(`/exams/${id}/status`);
 
         if (statusRes.data.hasSubmitted) {
           toast.error('You have already submitted this exam');
@@ -57,9 +55,7 @@ const TakeExam = () => {
         }
 
         // Now fetch exam details
-        const res = await axios.get(`http://localhost:5000/api/exams/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get(`/exams/${id}`);
 
         if (res.data.exam) {
           setExam(res.data.exam);
@@ -321,10 +317,7 @@ const TakeExam = () => {
     setShowManualFullscreenPrompt(false);
 
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.post(`http://localhost:5000/api/exams/${id}/start`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.post(`/exams/${id}/start`, {});
 
       setExamStarted(true);
 
@@ -340,20 +333,17 @@ const TakeExam = () => {
     }
   };
 
-  const handleSubmitExam = useCallback(async () => {
+  const handleSubmitExam = useCallback(async (timedOut = false) => {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-
       // Convert answers object to array format expected by backend
       const answersArray = Object.values(answers);
 
-      const res = await axios.post(`http://localhost:5000/api/exams/${id}/submit`, {
-        answers: answersArray
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await api.post(`/exams/${id}/submit`, {
+        answers: answersArray,
+        timedOut
       });
 
       // Exit fullscreen when exam is submitted
@@ -386,7 +376,8 @@ const TakeExam = () => {
       }, 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && examStarted) {
-      handleSubmitExam();
+      toast.warning('Time is up! Your exam is being submitted automatically.');
+      handleSubmitExam(true);
     }
   }, [timeLeft, examStarted, handleSubmitExam]);
 
@@ -611,10 +602,7 @@ const TakeExam = () => {
       }
 
       // Now start the exam since fullscreen is confirmed
-      const token = localStorage.getItem('token');
-      const res = await axios.post(`http://localhost:5000/api/exams/${id}/start`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.post(`/exams/${id}/start`, {});
 
       setExamStarted(true);
 

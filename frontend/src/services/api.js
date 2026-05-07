@@ -44,6 +44,8 @@ export const authAPI = {
   register: (userData) => api.post('/auth/register', userData),
   getProfile: () => api.get('/auth/profile'),
   updateProfile: (profileData) => api.put('/users/profile', profileData),
+  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  resetPassword: (token, password) => api.put(`/auth/reset-password/${token}`, { password }),
 };
 
 // Teacher API
@@ -70,9 +72,11 @@ export const parentAPI = {
   getChildPerformance: (studentId) => api.get(`/parents/dashboard/children/${studentId}/performance`),
   getChildAttendance: (studentId, params) => api.get(`/parents/dashboard/children/${studentId}/attendance`, { params }),
   contactTeacher: (data) => api.post('/parents/dashboard/contact-teacher', data),
+  addChild: (data) => api.post('/parents/dashboard/children/add', data),
   getParentNotifications: () => api.get('/parents/dashboard/notifications'),
   markNotificationRead: (notificationId) => api.put(`/parents/dashboard/notifications/${notificationId}/read`),
   updateCommunicationPreferences: (preferences) => api.put('/parents/dashboard/preferences', preferences),
+  getStaff: () => api.get('/users/role/staff'),
 
   // Auth
   parentLogin: (credentials) => api.post('/auth/login', credentials),

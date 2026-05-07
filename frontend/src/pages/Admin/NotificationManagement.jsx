@@ -2,7 +2,7 @@ import api from '../../services/api';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { Bell, Trash2, Send, Users, AlertTriangle, Info, CheckCircle, Plus, Search, Filter } from 'lucide-react';
+import { Bell, Trash2, Send, Users, AlertTriangle, Info, CheckCircle, Plus, Search, Filter, BookOpen, Shield } from 'lucide-react';
 
 const NotificationManagement = () => {
   const [notifications, setNotifications] = useState([]);
@@ -13,13 +13,17 @@ const NotificationManagement = () => {
     message: '',
     priority: 'medium',
     title: '',
-    sendAsEmail: false
+    sendAsEmail: false,
+    isScrolling: false
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState('');
+  const [recipientRoleFilter, setRecipientRoleFilter] = useState('all');
+  const [recipientSearchTerm, setRecipientSearchTerm] = useState('');
+  const [targetType, setTargetType] = useState('all'); // 'all' or 'specific'
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,9 +60,10 @@ const NotificationManagement = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotifications([...notifications, res.data.notification]);
-      setFormData({ userId: '', type: 'exam_scheduled', message: '', priority: 'medium' });
+      setFormData({ userId: '', type: 'general', message: '', priority: 'medium', title: '', sendAsEmail: false, isScrolling: false });
       setIsFormOpen(false);
       setSelectedUser('');
+      setTargetType('all');
       toast.success('Notification sent successfully');
     } catch {
       toast.error('Failed to send notification');
@@ -102,9 +107,10 @@ const NotificationManagement = () => {
 
       await Promise.all(promises);
       toast.success(`Notification sent to ${users.length} users successfully`);
-      setFormData({ userId: '', type: 'exam_scheduled', message: '', priority: 'medium' });
+      setFormData({ userId: '', type: 'general', message: '', priority: 'medium', title: '', sendAsEmail: false, isScrolling: false });
       setIsFormOpen(false);
       setSelectedUser('');
+      setTargetType('all');
 
       // Refresh notifications
       const res = await api.get('/notifications', {
@@ -263,7 +269,7 @@ const NotificationManagement = () => {
         {/* Notification Form Modal */}
         {isFormOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
                   Send Notification
@@ -287,26 +293,40 @@ const NotificationManagement = () => {
                         type="radio"
                         id="specific-user"
                         name="recipient-type"
-                        checked={formData.userId !== ''}
-                        onChange={() => setFormData({ ...formData, userId: selectedUser || '' })}
+                        checked={targetType === 'specific'}
+                        onChange={() => {
+                           setTargetType('specific');
+                           setFormData({ ...formData, userId: selectedUser || 'temp' });
+                        }}
                         className="w-4 h-4 text-blue-600"
                       />
                       <label htmlFor="specific-user" className="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300">
                         Search and Select Student/Parent
                       </label>
                     </div>
-                    {formData.userId !== '' && (
+                    {targetType === 'specific' && (
                       <div className="ml-7 space-y-3">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                          <input 
-                            type="text"
-                            placeholder="Type name or email to filter list..."
-                            onChange={(e) => {
-                              // Local filter logic or just let the select handle it
-                            }}
-                            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-blue-500"
-                          />
+                        <div className="grid grid-cols-2 gap-3">
+                           <div className="relative">
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                              <input 
+                                type="text"
+                                placeholder="Search by name..."
+                                className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg"
+                                onChange={(e) => {
+                                   setRecipientSearchTerm(e.target.value);
+                                }}
+                              />
+                           </div>
+                           <select 
+                             className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg"
+                             onChange={(e) => setRecipientRoleFilter(e.target.value)}
+                           >
+                              <option value="all">Any Role</option>
+                              <option value="student">Students Only</option>
+                              <option value="parent">Parents Only</option>
+                              <option value="teacher">Teachers Only</option>
+                           </select>
                         </div>
                         <select
                           value={selectedUser}
@@ -314,12 +334,22 @@ const NotificationManagement = () => {
                             setSelectedUser(e.target.value);
                             setFormData({ ...formData, userId: e.target.value });
                           }}
-                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 font-bold"
+                          required
                         >
-                          <option value="">-- Choose User --</option>
-                          {users.map(user => (
+                          <option value="">-- Choose from {recipientRoleFilter === 'all' ? 'All' : recipientRoleFilter} list --</option>
+                          {users
+                            .filter(u => recipientRoleFilter === 'all' || u.role === recipientRoleFilter)
+                            .filter(u => {
+                               if (!recipientSearchTerm) return true;
+                               const search = recipientSearchTerm.toLowerCase();
+                               return (u.username?.toLowerCase().includes(search)) || 
+                                      (u.email?.toLowerCase().includes(search)) ||
+                                      (u.profile?.fullName?.toLowerCase().includes(search));
+                            })
+                            .map(user => (
                             <option key={user._id} value={user._id}>
-                              [{user.role.toUpperCase()}] {user.username} ({user.email})
+                               [{user.role?.toUpperCase() || 'USER'}] {user.profile?.fullName || user.username} ({user.email})
                             </option>
                           ))}
                         </select>
@@ -331,8 +361,11 @@ const NotificationManagement = () => {
                         type="radio"
                         id="all-users"
                         name="recipient-type"
-                        checked={formData.userId === ''}
-                        onChange={() => setFormData({ ...formData, userId: '' })}
+                        checked={targetType === 'all'}
+                        onChange={() => {
+                           setTargetType('all');
+                           setFormData({ ...formData, userId: '' });
+                        }}
                         className="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600"
                       />
                       <label htmlFor="all-users" className="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -409,18 +442,35 @@ const NotificationManagement = () => {
                 </div>
 
                 {/* Email Option */}
-                <div className="flex items-center space-x-2 bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
-                  <input
-                    type="checkbox"
-                    id="sendAsEmail"
-                    name="sendAsEmail"
-                    checked={formData.sendAsEmail}
-                    onChange={(e) => setFormData({ ...formData, sendAsEmail: e.target.checked })}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-                  />
-                  <label htmlFor="sendAsEmail" className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                    Also send this notification as an Email to the user/parent
-                  </label>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
+                    <input
+                      type="checkbox"
+                      id="sendAsEmail"
+                      name="sendAsEmail"
+                      checked={formData.sendAsEmail}
+                      onChange={(e) => setFormData({ ...formData, sendAsEmail: e.target.checked })}
+                      className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor="sendAsEmail" className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                      Also send this notification as an Email to the user/parent
+                    </label>
+                  </div>
+
+                  <div className="flex items-center space-x-2 bg-purple-50 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-100 dark:border-purple-800">
+                    <input
+                      type="checkbox"
+                      id="isScrolling"
+                      name="isScrolling"
+                      checked={formData.isScrolling}
+                      onChange={(e) => setFormData({ ...formData, isScrolling: e.target.checked })}
+                      className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+                    />
+                    <label htmlFor="isScrolling" className="text-sm font-medium text-purple-700 dark:text-purple-300 flex items-center">
+                      <span className="flex h-2 w-2 rounded-full bg-purple-500 mr-2 animate-pulse"></span>
+                      Display as Scrolling Notice (Marquee) on Dashboards
+                    </label>
+                  </div>
                 </div>
 
                 {/* Submit Buttons */}
@@ -432,12 +482,12 @@ const NotificationManagement = () => {
                   >
                     Cancel
                   </button>
-                  {formData.userId === '' ? (
+                  {targetType === 'all' ? (
                     <button
                       type="button"
                       onClick={handleSendToAll}
                       disabled={isSending || !formData.message.trim()}
-                      className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-bold"
                     >
                       {isSending ? (
                         <>
@@ -447,15 +497,15 @@ const NotificationManagement = () => {
                       ) : (
                         <>
                           <Send className="w-5 h-5 mr-2" />
-                          Send to All
+                          Send to All Users
                         </>
                       )}
                     </button>
                   ) : (
                     <button
                       type="submit"
-                      disabled={isSending}
-                      className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      disabled={isSending || !selectedUser}
+                      className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-bold"
                     >
                       {isSending ? (
                         <>

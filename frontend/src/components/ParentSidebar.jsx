@@ -36,7 +36,7 @@ const ParentSidebar = ({ isOpen, toggleSidebar }) => {
       icon: UserCheck,
     },
     {
-      name: 'Performance',
+      name: 'Child Monitoring',
       path: '/parent/performance',
       icon: TrendingUp,
     },
