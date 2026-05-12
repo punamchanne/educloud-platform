@@ -334,6 +334,9 @@ const TakeExam = () => {
   };
 
   const handleSubmitExam = useCallback(async (timedOut = false) => {
+    // Ensure timedOut is a boolean (prevents circular reference error when called from onClick)
+    const isTimedOut = typeof timedOut === 'boolean' ? timedOut : false;
+
     if (isSubmitting) return;
 
     setIsSubmitting(true);
@@ -343,7 +346,7 @@ const TakeExam = () => {
 
       const res = await api.post(`/exams/${id}/submit`, {
         answers: answersArray,
-        timedOut
+        timedOut: isTimedOut
       });
 
       // Exit fullscreen when exam is submitted
