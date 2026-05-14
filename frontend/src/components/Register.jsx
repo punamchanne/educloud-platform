@@ -188,7 +188,9 @@ const Register = () => {
                     className="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 bg-white hover:border-purple-300 outline-none"
                   >
                     <option value="student" className="text-gray-900">Student</option>
+                    <option value="teacher" className="text-gray-900">Teacher</option>
                     <option value="parent" className="text-gray-900">Parent</option>
+                    <option value="admin" className="text-gray-900">Admin</option>
                   </select>
                 </div>
 
