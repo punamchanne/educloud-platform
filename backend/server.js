@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
 import cloudinary from './config/cloudinary.js';
+import { seedAdmin } from './utils/seedAdmin.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -181,6 +182,7 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await connectDB();
+    await seedAdmin();
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
