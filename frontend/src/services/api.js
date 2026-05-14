@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.MODE === 'production' 
-  ? '/api' 
+  ? 'https://educloud-platform.onrender.com/api' 
   : 'http://localhost:5000/api';
 
 // Create axios instance with default config
